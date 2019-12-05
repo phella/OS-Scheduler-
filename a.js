@@ -1,4 +1,4 @@
-let contextSwitching = 0.5;
+let contextSwitching = 2;
 let quantumTime = 0.5;
 const data = [["x", "y"]];
 class process {
@@ -90,6 +90,7 @@ function HPF(processes) {
 	}
 }
 function SRTN(processes) {
+	let last =-1;
 	for (j = 1; j < 200; j += 0.0001) {
 		processes.sort(sortExecution);
 		for (i = 0; i < processes.length; i++) {
@@ -106,8 +107,14 @@ function SRTN(processes) {
 				}
 				let end = j;
 				let rtime = new Time(start, end);
+				if(processes[i] == last ){
+					let x = processes[i].running.pop();
+					rtime.start = x.start;
+				} else  {
+					rtime.start += contextSwitching;
+				}
 				processes[i].running.push(rtime);
-				j = j + contextSwitching;
+				last = processes[i];
 				break;
 			}
 		}
@@ -134,14 +141,16 @@ function RR(processes) {
 				j += quantumTime;
 			}
 			let end = j;
-			if (last != ready[i]) {
+			if (last != ready[i] -1 ) {
+				start += contextSwitching;
+				end += contextSwitching;
 				j += contextSwitching;
 			} else {
 				let x = processes[ready[i] - 1].running.pop();
 				start = x.start;
 			}
 			let rtime = new Time(start, end);
-			last = ready[i];
+			last = ready[i] -1 ;
 			processes[ready[i] - 1].running.push(rtime);
 		}
 		ready = [];
@@ -167,7 +176,7 @@ function getarr() {
 }
 
 function test(proccesses) {
-	HPF(proccesses);
+	RR(proccesses);
 	console.log(proccesses);
 	buildGraph(proccesses);
 }
