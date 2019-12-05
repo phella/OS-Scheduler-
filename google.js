@@ -4,8 +4,8 @@ function drawChart() {
   var data = new google.visualization.arrayToDataTable(getarr());
 
   var options = {
-	title: 'Company Performance',
-	hAxis: {title: 'Year',  titleTextStyle: {color: '#333'}},
+	title: 'proccess number',
+	hAxis: {title: 'Time',  titleTextStyle: {color: '#333'}},
 	vAxis: {minValue: 0}
   };
 
