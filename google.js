@@ -1,3 +1,5 @@
+
+setTimeout( ()=>{
 google.charts.load('current', {'packages':['corechart']});
 google.charts.setOnLoadCallback(drawChart);
 function drawChart() {
@@ -12,3 +14,4 @@ function drawChart() {
   var chart = new google.visualization.AreaChart(document.getElementById('chart_div'));
   chart.draw(data, options);
 }
+} ,  1000);

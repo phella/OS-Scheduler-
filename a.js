@@ -191,7 +191,7 @@ for(i=0;i<processes.length;i++)
 	 	let	x=processes[i].running[j-1].end.toFixed(2);
 		let	y=(processes[i].running[j].start-contextSwitching*n-0.0001*n).toFixed(2);
 
-		console.log(x,y);
+		// console.log(x,y);
 		if(x==y)
 		{
 			processes[i].running[j-1].end=(processes[i].running[j].end-contextSwitching-0.0001);
@@ -217,20 +217,13 @@ function buildGraph(processes) {
 		})
 
 	});
-	console.log(data);
 	data.sort(sortGraph);
-	// drawChart(data);
 }
-function getarr(){
+function getarr() {
 	return data;
 }
 
-(function test(){
-let process1 = new process(1,1,7,4);
-let process2 = new process(2,2,1,2);
-let process3 = new process(3,1,4,1);
-let processes = [process1 , process2 , process3];
-RR(processes);
-
-buildGraph(processes);
-})();
+function test(proccesses){
+	FCFS(proccesses);
+	buildGraph(proccesses);
+}
