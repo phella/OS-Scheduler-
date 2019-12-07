@@ -1,14 +1,16 @@
-let contextSwitching = 2;
-let quantumTime = 0.5;
+let contextSwitching = 0.5;
+let quantumTime = 1;
 const data = [["x", "y"]];
 class process {
 	constructor(number, arrival, excution, priority) {
 		this.number = number;
 		this.arrival = arrival;
 		this.excution = excution;
+		this.remaining = excution;
 		this.priority = priority;
 		this.finish = -1;
 		this.running = [];
+		this.end = -1;
 		this.done = false;
 	}
 }
@@ -121,40 +123,53 @@ function SRTN(processes) {
 	}
 }
 
-function RR(processes) {
-	let ready = [];
+function roundRobin(processes) {
+	let processes2 = processes.slice();
+	processes2.sort(sortArrival);
+	let timer = 0;
+	let queue = [];
+	let finished = [];
 	let last = -1;
-	for (j = 0; j < 200; j += 0.0001) {
-		for (k = 0; k < processes.length; k++) {
-			if (processes[k].done == false && processes[k].arrival <= j) {
-				ready.push(processes[k].number);
+	while(processes2.length != 0 || queue.length != 0){
+		let j = 0;
+		while(j< processes2.length &&  processes2[j].arrival <= timer){
+			queue.push(	processes2.shift());
+			j++;
+		}
+		if(queue.length == 0){
+			timer += 0.0001;	
+		}
+		for(let i = 0 ; i < queue.length ; i++) {
+			if(queue[0].number == last){
+				timer -= contextSwitching;
+			}
+			let start = timer;
+			let run = queue[0].remaining > quantumTime ? quantumTime : queue[0].remaining;
+			queue[0].remaining -= run;
+			let end = start + run ;
+			if(queue[0].number == last){
+				let lrun = queue[0].running.pop();
+				start = lrun.start;
+			}
+			let rtime = new Time(start,end);
+			queue[0].running.push(rtime);
+			last = queue[0].number;
+			let process = queue.shift();
+			timer = end + contextSwitching; 
+			let j = 0;
+			while(j< processes2.length &&  processes2[j].arrival <= timer - contextSwitching) {
+				queue.push(	processes2.shift());
+				j++;
+			} 
+			if(process.remaining <= 0) {
+				finished.push(process);
+				process.end = end;
+			} else {
+				queue.push(process);
 			}
 		}
-		for (i = 0; i < ready.length; i++) {
-			let start = j;
-			let temp = processes[ready[i] - 1].excution;
-			processes[ready[i] - 1].excution -= quantumTime;
-			if (processes[ready[i] - 1].excution <= 0) {
-				j += temp;
-				processes[ready[i] - 1].done = true;
-			} else {
-				j += quantumTime;
-			}
-			let end = j;
-			if (last != ready[i] -1 ) {
-				start += contextSwitching;
-				end += contextSwitching;
-				j += contextSwitching;
-			} else {
-				let x = processes[ready[i] - 1].running.pop();
-				start = x.start;
-			}
-			let rtime = new Time(start, end);
-			last = ready[i] -1 ;
-			processes[ready[i] - 1].running.push(rtime);
-		}
-		ready = [];
 	}
+	processes = finished.slice();
 }
 
 function buildGraph(processes) {
@@ -176,7 +191,7 @@ function getarr() {
 }
 
 function test(proccesses) {
-	RR(proccesses);
+	roundRobin(proccesses);
 	console.log(proccesses);
 	buildGraph(proccesses);
 }
