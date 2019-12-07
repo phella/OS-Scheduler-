@@ -13,6 +13,16 @@ class process {
 		this.end = -1;
 		this.done = false;
 	}
+	getTurnAround(){
+		this.turnAround = this.finish - this.arrival;
+		return this.turnAround;
+	}
+	getWeightedTurnAround(){
+		return (this.turnAround / this.excution);
+	}
+	getWaitTime(){
+		return this.turnAround - this.excution;
+	}
 }
 
 class Time {
@@ -163,7 +173,7 @@ function roundRobin(processes) {
 			} 
 			if(process.remaining <= 0) {
 				finished.push(process);
-				process.end = end;
+				process.finish = end;
 			} else {
 				queue.push(process);
 			}
@@ -192,6 +202,34 @@ function getarr() {
 
 function test(proccesses) {
 	roundRobin(proccesses);
-	console.log(proccesses);
 	buildGraph(proccesses);
+	console.log(proccesses);	
+	buildTable(proccesses);
+	
+}
+
+function buildTable(proccesses){
+	let table = document.getElementById("myTable");
+	let turnAroundSum = 0;
+	let WeightedTurnAroundSum = 0;
+	for(let i = 1; i <= proccesses.length;i++){
+		let row = table.insertRow(i);
+		let cell1 = row.insertCell(0);
+		let cell2 = row.insertCell(1);
+		let cell3 = row.insertCell(2);
+		let cell4 = row.insertCell(3);
+	turnAroundSum += proccesses[i-1].getTurnAround();
+	WeightedTurnAroundSum += proccesses[i-1].getWeightedTurnAround();
+	cell1.innerHTML = proccesses[i-1].number;
+	cell2.innerHTML = proccesses[i-1].getTurnAround();
+	cell3.innerHTML = proccesses[i-1].getWaitTime();
+	cell4.innerHTML = proccesses[i-1].getWeightedTurnAround();
+	}
+	let row = table.insertRow(proccesses.length + 1);
+	let cell1 = row.insertCell(0);
+	let cell2 = row.insertCell(1);
+	let cell3 = row.insertCell(2);
+	let cell4 = row.insertCell(3);
+	cell2.innerHTML = turnAroundSum / proccesses.length ;
+	cell4.innerHTML = WeightedTurnAroundSum / proccesses.length;
 }
