@@ -69,10 +69,10 @@ function FCFS(processes) {
 					j = j + processes[i].excution;
 					const end = j;
 					let rtime = new Time(start, end);
+					processes[i].finish = end;
 					processes[i].running.push(rtime);
 					processes[i].done = true;
 					d++;
-					j = j + contextSwitching
 					break;
 				}
 			}
@@ -91,10 +91,10 @@ function HPF(processes) {
 					j = j + processes[i].excution;
 					const end = j;
 					let rtime = new Time(start, end);
+					processes[i].finish = end;
 					processes[i].running.push(rtime);
 					processes[i].done = true;
 					d++;
-					j = j + contextSwitching
 					break;
 				}
 			}
@@ -221,15 +221,15 @@ function buildTable(proccesses){
 	turnAroundSum += proccesses[i-1].getTurnAround();
 	WeightedTurnAroundSum += proccesses[i-1].getWeightedTurnAround();
 	cell1.innerHTML = proccesses[i-1].number;
-	cell2.innerHTML = proccesses[i-1].getTurnAround();
-	cell3.innerHTML = proccesses[i-1].getWaitTime();
-	cell4.innerHTML = proccesses[i-1].getWeightedTurnAround();
+	cell2.innerHTML = proccesses[i-1].getTurnAround().toFixed(3);
+	cell3.innerHTML = proccesses[i-1].getWaitTime().toFixed(3);
+	cell4.innerHTML = proccesses[i-1].getWeightedTurnAround().toFixed(3);
 	}
 	let row = table.insertRow(proccesses.length + 1);
 	let cell1 = row.insertCell(0);
 	let cell2 = row.insertCell(1);
 	let cell3 = row.insertCell(2);
 	let cell4 = row.insertCell(3);
-	cell2.innerHTML = turnAroundSum / proccesses.length ;
-	cell4.innerHTML = WeightedTurnAroundSum / proccesses.length;
+	cell2.innerHTML = (turnAroundSum / proccesses.length).toFixed(3) ;
+	cell4.innerHTML = (WeightedTurnAroundSum / proccesses.length).toFixed(3);
 }
