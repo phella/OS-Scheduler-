@@ -45,7 +45,7 @@ function sortPriority(a, b) {
 }
 
 function sortExecution(a, b) {
-	return compare(a, b, "excution");
+	return compare(a, b, "remaining");
 }
 function compare(a, b, propertyA) {
 	let comparison = 0;
@@ -102,35 +102,60 @@ function HPF(processes) {
 	}
 }
 function SRTN(processes) {
-	let last =-1;
-	for (j = 1; j < 200; j += 0.0001) {
-		processes.sort(sortExecution);
-		for (i = 0; i < processes.length; i++) {
-			if (processes[i].done == false && processes[i].arrival <= j) {
-				let start = j;
-				let temp = processes[i].excution;
-				processes[i].excution -= quantumTime;
-				if (processes[i].excution <= 0) {
-					j += temp;
-					processes[i].done = true;
-				}
-				else {
-					j += quantumTime;
-				}
-				let end = j;
-				let rtime = new Time(start, end);
-				if(processes[i] == last ){
-					let x = processes[i].running.pop();
-					rtime.start = x.start;
-				} else  {
-					rtime.start += contextSwitching;
-				}
-				processes[i].running.push(rtime);
-				last = processes[i];
-				break;
+	let processes2 = processes.slice();
+	processes2.sort(sortArrival);
+	let timer = 0;
+	let queue = [];
+	let finished = [];
+	let last = -1;
+	// sortExecution
+	while(processes2.length != 0 || queue.length != 0){
+		let j = 0;
+		processes2.sort(sortArrival);
+		while(j< processes2.length &&  processes2[j].arrival <= timer){
+			queue.push(	processes2.shift());
+			j++;
+		}
+		if(queue.length == 0){
+			timer += 0.0001;
+		}
+
+		if(0 < queue.length) {
+			// console.log(queue);
+			queue.sort(sortExecution);
+			// console.log(queue);
+			if(queue[0].number == last){
+				timer -= contextSwitching;
+			}
+			let start = timer;
+			let run = queue[0].remaining > 0.0001 ? 0.0001 : queue[0].remaining;
+			queue[0].remaining -= run;
+			let end = start + run ;
+			if(queue[0].number == last)
+			{
+				let lrun = queue[0].running.pop();
+				start = lrun.start;
+			}
+			let rtime = new Time(start,end);
+			queue[0].running.push(rtime);
+			last = queue[0].number;
+		 	let process = queue.shift();
+			timer = end + contextSwitching;
+			let j = 0;
+			while(j< processes2.length &&  processes2[j].arrival <= timer - contextSwitching) {
+				queue.push(	processes2.shift());
+				j++;
+			}
+			if(process.remaining <= 0) {
+				finished.push(process);
+				process.finish = end;
+			} else {
+				queue.push(process);
 			}
 		}
 	}
+	processes = finished.slice();
+
 }
 
 function roundRobin(processes) {
@@ -147,7 +172,7 @@ function roundRobin(processes) {
 			j++;
 		}
 		if(queue.length == 0){
-			timer += 0.0001;	
+			timer += 0.0001;
 		}
 		for(let i = 0 ; i < queue.length ; i++) {
 			if(queue[0].number == last){
@@ -165,12 +190,12 @@ function roundRobin(processes) {
 			queue[0].running.push(rtime);
 			last = queue[0].number;
 			let process = queue.shift();
-			timer = end + contextSwitching; 
+			timer = end + contextSwitching;
 			let j = 0;
 			while(j< processes2.length &&  processes2[j].arrival <= timer - contextSwitching) {
 				queue.push(	processes2.shift());
 				j++;
-			} 
+			}
 			if(process.remaining <= 0) {
 				finished.push(process);
 				process.finish = end;
@@ -201,11 +226,11 @@ function getarr() {
 }
 
 function test(proccesses) {
-	roundRobin(proccesses);
+	SRTN(proccesses);
 	buildGraph(proccesses);
-	console.log(proccesses);	
+	console.log(proccesses);
 	buildTable(proccesses);
-	
+
 }
 
 function buildTable(proccesses){
