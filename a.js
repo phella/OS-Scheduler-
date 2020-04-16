@@ -226,8 +226,8 @@ function getarr() {
 }
 
 function test(proccesses) {
-	SRTN(proccesses);
-	buildGraph(proccesses);
+	modified_rr(proccesses);
+	//buildGraph(proccesses);
 	console.log(proccesses);
 	buildTable(proccesses);
 
@@ -257,4 +257,63 @@ function buildTable(proccesses){
 	let cell4 = row.insertCell(3);
 	cell2.innerHTML = (turnAroundSum / proccesses.length).toFixed(3) ;
 	cell4.innerHTML = (WeightedTurnAroundSum / proccesses.length).toFixed(3);
+}
+
+function modified_rr(processes){
+	processes.sort(sortArrival);
+	queue = [];
+	let t = 0;
+	while(processes.length != 0){
+		if(queue.length == 0){
+			t += 0.001;
+		}
+		let counter = 0;
+		if(processes[counter].arrival < t){
+			insert_process(queue , processes.shift());
+		}
+		const quantum = arr[Math.ceil(arr.length/2)];
+		counter = 0 ;
+		finished = 0;
+		processes.sort(sortExecution);
+		while(counter < queue.length){
+			const next_pos = counter - finished;
+			const next_len = queue.length - finished;
+			const scale_factor = get_factor( quantum , queue[counter].remaining , queue[counter].priority , next_pos/next_len );
+			if(quantum * scale_factor >= queue[counter].remaining){
+				finished += 1;
+				queue.splice(counter , 1);
+				queue[counter].finish = t;
+			} else {
+				remaining -= quantum * scale_factor;
+			}
+			counter++;
+		}
+	}
+}
+
+function insert_process(arr , el){
+	for( let i = 0 ; i < arr.length ; i++){
+		if(el.remaining < arr[i].remaining){
+			arr.splice(i, 0, el);
+			break;
+		}
+	}
+}
+
+function scale_factor(quantum ,remaining , priority , next_pos){
+	if(remaining < 2 * quantum ){
+		return 2;
+	} else if (remaining < 5 * quantum && next_pos <= 0.5){
+		return 1;
+	} else if ( remaining < 5 * quantum && next_pos > 0.5){
+		return 2;
+	} 
+
+	if(priority == 0){
+		return 1.3;
+	} else if ( priority == 1){
+		return 1;
+	}else {
+		return 0.8;
+	}
 }
