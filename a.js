@@ -279,6 +279,7 @@ function modified_rr(processes , finished_array){
 		//console.log(queue)
 		if(queue != false)
 			quantum = queue[Math.floor(queue.length/2)].remaining;
+		quantum = (quantum > 100)? 100:quantum ;
 		counter = 0 ;
 		finished = 0;
 		queue.sort(sortExecution);
