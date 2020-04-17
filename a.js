@@ -1,6 +1,7 @@
 let contextSwitching = 0.5;
 let quantumTime = 1;
 const data = [["x", "y"]];
+number = 0;
 class process {
 	constructor(number, arrival, excution, priority) {
 		this.number = number;
@@ -226,10 +227,12 @@ function getarr() {
 }
 
 function test(proccesses) {
-	modified_rr(proccesses);
+	arr = []
+	modified_rr(proccesses , arr);
 	//buildGraph(proccesses);
-	console.log(proccesses);
-	buildTable(proccesses);
+	console.log(arr);
+	console.log(number);
+	buildTable(arr);
 
 }
 
@@ -259,61 +262,80 @@ function buildTable(proccesses){
 	cell4.innerHTML = (WeightedTurnAroundSum / proccesses.length).toFixed(3);
 }
 
-function modified_rr(processes){
-	processes.sort(sortArrival);
+function modified_rr(processes , finished_array){
+	processes.sort(sortExecution);
 	queue = [];
 	let t = 0;
-	while(processes.length != 0){
+	while(processes.length != 0 ){
 		if(queue.length == 0){
-			t += 0.001;
+			t += 0.1;
 		}
 		let counter = 0;
 		if(processes[counter].arrival < t){
-			insert_process(queue , processes.shift());
+			insert_process(queue , processes[0]);
+			processes.shift()
 		}
-		const quantum = arr[Math.ceil(arr.length/2)];
+		let quantum;
+		//console.log(queue)
+		if(queue != false)
+			quantum = queue[Math.floor(queue.length/2)].remaining;
 		counter = 0 ;
 		finished = 0;
-		processes.sort(sortExecution);
+		queue.sort(sortExecution);
+
+
 		while(counter < queue.length){
 			const next_pos = counter - finished;
 			const next_len = queue.length - finished;
 			const scale_factor = get_factor( quantum , queue[counter].remaining , queue[counter].priority , next_pos/next_len );
+		
 			if(quantum * scale_factor >= queue[counter].remaining){
 				finished += 1;
-				queue.splice(counter , 1);
+				t += queue[counter].remaining;
 				queue[counter].finish = t;
+				finished_array.push(queue[counter]);
+				// console.log(queue[counter])
+				queue.splice(counter , 1);
 			} else {
-				remaining -= quantum * scale_factor;
+				queue[counter].remaining -= quantum * scale_factor;
+				t += quantum * scale_factor;
 			}
+			t += contextSwitching;
+			number++;
 			counter++;
 		}
 	}
 }
 
 function insert_process(arr , el){
-	for( let i = 0 ; i < arr.length ; i++){
+	let i = 0;
+	if(arr.length == 0){
+		arr.splice(i,0,el);
+		return ;
+	}
+	for(  ; i < arr.length ; i++){
 		if(el.remaining < arr[i].remaining){
 			arr.splice(i, 0, el);
-			break;
+			return;
 		}
 	}
+	arr.splice(i + 1,0,el);
 }
 
-function scale_factor(quantum ,remaining , priority , next_pos){
+function get_factor(quantum ,remaining , priority , next_pos){
 	if(remaining < 2 * quantum ){
-		return 2;
+		return 1.2;
 	} else if (remaining < 5 * quantum && next_pos <= 0.5){
 		return 1;
 	} else if ( remaining < 5 * quantum && next_pos > 0.5){
-		return 2;
+		return 1;
 	} 
 
 	if(priority == 0){
-		return 1.3;
+		return 1.4;
 	} else if ( priority == 1){
 		return 1;
 	}else {
-		return 0.8;
+		return 0.7;
 	}
 }

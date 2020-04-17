@@ -12,9 +12,9 @@ function setup() {
   parseText(result);
   let arrivalRandom = Prob.normal(mean1, sigma1);
   let exeRandom = Prob.normal(mean2, sigma2);
-  let priorityRandom = Prob.poisson(lambda);
+  // let priorityRandom = Prob.poisson(lambda);
   for (let i =0 ;i<noProcesses;i++) {
-    proccesses.push(new process(i+1 ,Number( arrivalRandom().toFixed(2) ),Number( exeRandom().toFixed(2)), priorityRandom()));
+    proccesses.push(new process(i+1 ,Number( arrivalRandom().toFixed(2) ),Number( exeRandom().toFixed(2)),getRandomInt(3)));
   }
   const strings = proccesToSting(proccesses);
   saveStrings(strings,'out.txt');
@@ -43,4 +43,8 @@ function proccesToSting(proccesses) {
     arr.push(str);
   }
   return arr;
+}
+
+function getRandomInt(max) {
+  return Math.floor(Math.random() * Math.floor(max));
 }
