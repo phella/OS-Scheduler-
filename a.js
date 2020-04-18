@@ -228,6 +228,7 @@ function getarr() {
 
 function test(proccesses) {
 	arr = []
+	
 	modified_rr(proccesses , arr);
 	//buildGraph(proccesses);
 	console.log(arr);
@@ -325,15 +326,15 @@ function insert_process(arr , el){
 
 function get_factor(quantum ,remaining , priority , next_pos){
 	if(remaining < 2 * quantum ){
-		return 1.2;
+		return 2;
 	} else if (remaining < 5 * quantum && next_pos <= 0.5){
-		return 1;
+		return 1.8;
 	} else if ( remaining < 5 * quantum && next_pos > 0.5){
-		return 1;
+		return 1.8;
 	} 
 
 	if(priority == 0){
-		return 1.4;
+		return 1.3;
 	} else if ( priority == 1){
 		return 1;
 	}else {
