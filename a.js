@@ -1,4 +1,4 @@
-let contextSwitching = 0.5;
+let contextSwitching = 0;
 let quantumTime = 1;
 const data = [["x", "y"]];
 number = 0;
@@ -228,9 +228,8 @@ function getarr() {
 
 function test(proccesses) {
 	arr = []
-	
-	modified_rr(proccesses , arr);
-	//buildGraph(proccesses);
+	modified_rr2(proccesses , arr);
+	buildGraph(arr);
 	console.log(arr);
 	console.log(number);
 	buildTable(arr);
@@ -339,5 +338,64 @@ function get_factor(quantum ,remaining , priority , next_pos){
 		return 1;
 	}else {
 		return 0.7;
+	}
+}
+
+
+
+
+function modified_rr2(processes, finished_array) {
+	processes.sort(sortExecution);
+	queue = [];
+	let t = 0;
+	while (processes.length != finished_array.length) {
+		let counter = 0;
+		for (let j = 0; j < processes.length;j++){
+			if ((processes[j].arrival <= t) && (processes[j].done == false)) {
+				insert_process(queue, processes[j]);
+				processes[j].done = true;
+			}
+
+		}
+		console.log(queue)
+
+		if (queue.length == 0) {
+			t += 0.1;
+		}
+		let quantum;
+		//console.log(queue)
+		if (queue != false)
+			quantum = queue[Math.floor(queue.length / 2)].remaining;
+		quantum = (quantum > 100) ? 100 : quantum;
+		counter = 0;
+		finished = 0;
+		queue.sort(sortExecution);
+		while (counter < queue.length) {
+			const next_pos = counter - finished;
+			const next_len = queue.length - finished;
+			const scale_factor = get_factor(quantum, queue[counter].remaining, queue[counter].priority, next_pos / next_len);
+			let start= t;
+			let end;
+			if (quantum * scale_factor >= queue[counter].remaining) {
+				finished += 1;
+				t += queue[counter].remaining;
+				end =  t;
+				let rtime = new Time(start, end);
+				queue[counter].running.push(rtime);
+				queue[counter].finish = t;
+				finished_array.push(queue[counter]);
+				console.log(finished_array.length)
+				queue.splice(counter, 1);
+			} else {
+				queue[counter].remaining -= quantum * scale_factor;
+				t += quantum * scale_factor;
+				end = t;
+				let rtime = new Time(start, end);
+				queue[counter].running.push(rtime);	
+			}
+			t += contextSwitching;
+			number++;
+			counter++;
+		}
 	}
 }

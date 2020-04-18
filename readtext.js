@@ -9,15 +9,20 @@ function preload() {
 }
 
 function setup() {
-  parseText(result);
-  let arrivalRandom = Prob.normal(mean1, sigma1);
-  let exeRandom = Prob.normal(mean2, sigma2);
+  //parseText(result);
+  //let arrivalRandom = Prob.normal(mean1, sigma1);
+  //let exeRandom = Prob.normal(mean2, sigma2);
   // let priorityRandom = Prob.poisson(lambda);
-  for (let i =0 ;i<noProcesses;i++) {
-    proccesses.push(new process(i+1 ,Number( arrivalRandom().toFixed(2) ),Number( exeRandom().toFixed(2)),getRandomInt(3)));
-  }
+  //for (let i =0 ;i<noProcesses;i++) {
+  //  proccesses.push(new process(i+1 ,Number( arrivalRandom().toFixed(2) ),Number( exeRandom().toFixed(2)),getRandomInt(3)));
+  //}
+  proccesses.push(new process(1,0,3,1));
+  proccesses.push(new process(2, 1, 5, 1));
+  proccesses.push(new process(3, 3, 2, 1));
+  proccesses.push(new process(4, 9, 5, 1));
+  proccesses.push(new process(5, 12, 5,1));
   const strings = proccesToSting(proccesses);
-  saveStrings(strings,'out.txt');
+  //saveStrings(strings,'out.txt');
   test(proccesses);
 }
 
